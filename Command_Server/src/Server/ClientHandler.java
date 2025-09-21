@@ -36,9 +36,13 @@ public class ClientHandler implements Runnable {
                 if (command.startsWith("cd ")) {
                     handleCd(command, out);
                 } else if (command.equals("pwd")) {
-                    out.println(currentDirectory);
+                    out.println("Current directory: " + currentDirectory);
+                } else if (command.startsWith("mkdir ")) {
+                    handleMkdir(command, out);
+                } else if (command.startsWith("del ")) {
+                    handleDel(command, out);
                 } else {
-                    handleExternalCommand(command, out);
+                    handleOtherCommand(command, out);
                 }
 
                 out.println("END_OF_OUTPUT");
@@ -52,27 +56,56 @@ public class ClientHandler implements Runnable {
     private void handleCd(String command, PrintWriter out) {
         String path = command.substring(3).trim();
         File newDir = new File(path);
-        if (!newDir.isAbsolute()) {
-            newDir = new File(currentDirectory, path);
-        }
+        if (!newDir.isAbsolute()) newDir = new File(currentDirectory, path);
+
         try {
             if (newDir.exists() && newDir.isDirectory()) {
                 currentDirectory = newDir.getCanonicalPath();
-                out.println("Directory changed to: " + currentDirectory);
+                out.println("Changed directory to: " + currentDirectory);
             } else {
-                out.println("cd: No such directory: " + path);
+                out.println("Error: Directory not found -> " + path);
             }
         } catch (IOException e) {
             out.println("Error changing directory: " + e.getMessage());
         }
     }
 
-    private void handleExternalCommand(String command, PrintWriter out) {
+    private void handleMkdir(String command, PrintWriter out) {
+        try {
+            String output = executeCommand(command);
+            if (output.isEmpty()) {
+                out.println("Directory created successfully.");
+            } else {
+                out.println( output);
+            }
+        } catch (Exception e) {
+            out.println("Error creating directory: " + e.getMessage());
+        }
+    }
+
+    private void handleDel(String command, PrintWriter out) {
+        try {
+            String output = executeCommand(command);
+            if (output.isEmpty()) {
+                out.println("File deleted successfully.");
+            } else {
+                out.println( output);
+            }
+        } catch (Exception e) {
+            out.println("Error deleting file: " + e.getMessage());
+        }
+    }
+
+    private void handleOtherCommand(String command, PrintWriter out) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<String> future = executor.submit(() -> executeCommand(command));
         try {
             String output = future.get(COMMAND_TIMEOUT, TimeUnit.SECONDS);
-            out.println(output.isEmpty() ? "" : output);
+            if (output.isEmpty()) {
+                out.println("Command executed successfully.");
+            } else {
+                out.println(output);
+            }
         } catch (TimeoutException e) {
             future.cancel(true);
             out.println("Error: Command timed out after " + COMMAND_TIMEOUT + " seconds.");
@@ -121,4 +154,8 @@ public class ClientHandler implements Runnable {
     public String getCurrentDirectory() {
         return currentDirectory;
     }
+    public void testChangeDir(String command) {
+        handleCd(command, new PrintWriter(System.out, true));
+    }
+
 }
