@@ -35,14 +35,17 @@ class ClientHandlerTest {
         ClientHandler ch = new ClientHandler();
         String original = ch.getCurrentDirectory();
 
-   
         File parent = new File(original).getParentFile();
-        if (parent != null) {
-            String parentPath = parent.getCanonicalPath();
-            ch.executeCommand("cd ..");
-            ch.executeCommand("cd \"" + parent.getName() + "\""); 
-      
-            assertNotNull(parentPath);
+        if (parent != null && parent.exists()) {
+     
+            ch.testChangeDir("cd " + parent.getCanonicalPath());
+            assertEquals(parent.getCanonicalPath(), ch.getCurrentDirectory(), 
+                         "Directory should change to parent");
+
+            ch.testChangeDir("cd " + original);
+            assertEquals(original, ch.getCurrentDirectory(), 
+                         "Directory should return to original");
         }
     }
+
 }
