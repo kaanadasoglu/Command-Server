@@ -4,12 +4,11 @@ You can run the project either through your IDE or directly from the terminal.
 
 1. **Compile the project (if using terminal)**  
    Navigate to the root folder and run:  
-   ```shell
+   ```
    javac Server/*.java Client/*.java
 Start the Server
 Run:
 
-shell
 ```
 java Server.Server
 ```
@@ -18,7 +17,7 @@ You should see:
 Server is listening on port 5000
 Start Clients
 Open a new terminal (or IDE run configuration) for each client and run:
-shell
+
 ```
 java Client.Client
 ```
