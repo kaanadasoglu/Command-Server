@@ -10,19 +10,18 @@ Start the Server
 Run:
 
 shell
-
+```
 java Server.Server
+```
 You should see:
-
-pgsql
 
 Server is listening on port 5000
 Start Clients
 Open a new terminal (or IDE run configuration) for each client and run:
-
 shell
-
+```
 java Client.Client
+```
 You will get a > prompt for entering commands.
 
 Multiple Clients:
